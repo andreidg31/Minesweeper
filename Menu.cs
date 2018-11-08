@@ -34,9 +34,17 @@ namespace Minesweeper
             e.Handled = !char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar);
         }
 
-        const int minWidth = 6, maxWidth = 48;
-        const int minHeight = 6, maxHeight = 24;
+        const int minWidth = 8, maxWidth = 48;
+        const int minHeight = 8, maxHeight = 24;
         const int minMines = 10;
+        
+        public void resetTable()
+        {
+            Program.gameForm = new Game(width, height, mines);
+            Program.gameForm.Show();
+            this.Hide();
+        }
+
         private void btnStart_Click(object sender, EventArgs e)
         {
             mines = width = height = 0;
@@ -58,15 +66,14 @@ namespace Minesweeper
                 canStart = false;
                 errorMessage = errorMessage + String.Format("The height must be between {0} and {1}!\n",minHeight,maxHeight);
             }
-            if (mines < minMines || mines > width * height - 1){
+            if (mines < minMines || mines > (int)((3 * width * height) / 4))
+            {
                 canStart = false;
-                errorMessage = errorMessage + String.Format("The number of mines must be between {0} and {1}!\n",minMines, width * height - 1);
+                errorMessage = errorMessage + String.Format("The number of mines must be between {0} and {1}!\n",minMines,(int)((3*width * height)/4));
             }
 
             if (canStart){
-                Program.gameForm = new Game(width, height, mines);
-                Program.gameForm.Show();
-                this.Hide();
+                resetTable();
             }
             else{
                 MessageBox.Show(errorMessage);

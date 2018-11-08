@@ -8,6 +8,7 @@ namespace Minesweeper
     static class Program
     {
         public static Game gameForm = null;
+        public static Menu mainMenu = null;
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -16,7 +17,7 @@ namespace Minesweeper
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Menu());
+            Application.Run(mainMenu = new Menu());
         }
     }
 }

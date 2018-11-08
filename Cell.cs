@@ -27,14 +27,23 @@ namespace Minesweeper
             this.btn = createButton();
         }
 
+        public void destroy()
+        {
+            //MessageBox.Show(String.Format("Removing control at {0} and {1}",this.posX,this.posY));
+            Program.gameForm.Controls.Remove(this.btn);
+            this.btn.Parent = null;
+            this.table = null;
+        }
+
         private Button createButton()
         {
             Button button = new Button();
             button.Size = new System.Drawing.Size(25, 25);
-            button.Location = new System.Drawing.Point(this.posY * 25 + 1, this.posX * 25 + 1);
+            button.Location = new System.Drawing.Point(this.posX*25+1,this.posY*25+1 + GameTable.submenuHeight);
             button.FlatStyle = FlatStyle.Popup;
             button.Visible = true;
             button.TabStop = false;
+            button.Tag = "cell";
             button.Font = new System.Drawing.Font("Franklin Gothic Medium", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             button.TextAlign = ContentAlignment.TopCenter;
             button.MouseDown += new System.Windows.Forms.MouseEventHandler(onBtnClick);
@@ -43,21 +52,29 @@ namespace Minesweeper
 
         private void onBtnClick(object sender, MouseEventArgs e)
         {
-            if (this.isRevealed||!this.table.ongoing)
-                return; 
+
+            if (this.isRevealed && e.Button == MouseButtons.Left && Control.ModifierKeys == Keys.Shift)
+            {
+                //MessageBox.Show(this.noFlagsNearby.ToString() + " " + this.noMinesNearby.ToString());
+               if (this.noFlagsNearby == this.noMinesNearby)
+                    this.table.revealNeightbours(this.posX, this.posY);
+            }
+
+            if (this.isRevealed || !this.table.ongoing)
+                return;
 
             switch (e.Button)
             {
                 case MouseButtons.Left:
                 {
-                    if (hasMine)
+                    if (hasMine&&!this.hasFlag)
                     {
                         this.table.gameOver();
                     }
                     else
                     {
                         if (!hasFlag)
-                            this.table.revealCells(this.posY, this.posX);
+                            this.table.revealCells(this.posX, this.posY);
                     }
                     break;
                 }
@@ -69,6 +86,7 @@ namespace Minesweeper
                         this.table.noFlags--;
                         if (this.hasMine)
                             this.table.noCorrectFlags--;
+                        this.table.addRemoveFlags(this.posX, this.posY, true);
                     }
                     else{
                         this.btn.Image = global::Minesweeper.Properties.Resources.flag;
@@ -82,9 +100,10 @@ namespace Minesweeper
                             this.table.isWon = true;
                             this.table.gameOver();
                         }
+                        this.table.addRemoveFlags(this.posX, this.posY,false);
                     }
                     this.hasFlag = !this.hasFlag;
-                    
+                    Program.gameForm.lblMinesLeft.Text = (this.table.getMines() - this.table.noFlags).ToString();
                     break;
                 }
             }
